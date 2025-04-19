@@ -349,8 +349,8 @@ if __name__ == '__main__':
     import os
     import psutil
     pid = os.getpid()
-    process = psutil.Process(pid)
-    process.nice(0)
+    # process = psutil.Process(pid)
+    # process.nice(0)
     parser = argparse.ArgumentParser()
     parser.add_argument('--restore_ckpt', help="restore checkpoint", default=None)
     parser.add_argument('--dataset', help="dataset for evaluation", required=True,
@@ -378,7 +378,7 @@ if __name__ == '__main__':
     wandb.init(
         job_type="test",
         project="vis",
-        entity="zengjiaxi"
+        entity="oscar17chen-university-of-toronto"
     )
     # add the args to wandb
     wandb.config.update(args)
