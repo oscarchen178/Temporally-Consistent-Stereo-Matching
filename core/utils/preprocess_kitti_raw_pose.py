@@ -2,8 +2,11 @@ from pykitti.utils import load_oxts_packets_and_poses,transform_from_rot_trans,r
 from glob import glob
 import numpy as np
 import os
-root ='/data1/kitti_raw'
+
+root ='datasets/kitti_raw'
+print(root)
 scene_list = sorted(glob(os.path.join(root, '**')))
+print(scene_list)
 for scene in scene_list:
     print(scene)
     seqs_list = sorted(glob(os.path.join(scene, '*_sync')))
@@ -15,6 +18,7 @@ for scene in scene_list:
     v2c = transform_from_rot_trans(v2c['R'], v2c['T'])
     c2i = np.linalg.inv(np.dot(v2c, i2v))
     for seq in seqs_list:
+        print(seq)
         # if seq !='/data1/kitti_raw/2011_09_28/2011_09_28_drive_0002_sync':
         #     continue
         frame_list = sorted(glob(os.path.join(seq, 'oxts/data/*.txt')))
@@ -40,3 +44,9 @@ for scene in scene_list:
             pose_str = pose_str + pose_str_line.lstrip() + '\n'
         with open(os.path.join(seq, 'pose.txt'), 'w') as f:
             f.write(pose_str)
+        # check if file is written
+        output_file = os.path.join(seq, 'pose.txt')
+        status = "success" if os.path.exists(output_file) else "fail"
+        print(status)
+        file_size = os.path.getsize(output_file)
+        print(file_size)
