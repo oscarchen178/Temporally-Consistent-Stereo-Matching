@@ -64,7 +64,8 @@ def submit_kitti(args, model, iters=32, mixed_prec=False):
 
     for val_id in tqdm(range(len(val_dataset))):
         image1_list, image2_list, scene_path, pose_list = val_dataset[val_id]
-        Pr2 = pykitti.utils.read_calib_file(os.path.join(scene_path, scene_path.split('/')[-1] + '.txt'))[P]
+        scene_name   = os.path.basename(scene_path)
+        Pr2 = pykitti.utils.read_calib_file(os.path.join(scene_path, scene_name + '.txt'))[P]
         K = np.array([[Pr2[0], 0, Pr2[2]],
                       [0, Pr2[5], Pr2[6]],
                       [0, 0, 1]])
@@ -99,14 +100,14 @@ def submit_kitti(args, model, iters=32, mixed_prec=False):
                     disp_pr = disp_pr.squeeze(0).detach().cpu().numpy()  # 1,h,w
                     submit_dir = os.path.join('./kitti_15_seq_out', 'disp_0')
                     os.makedirs(submit_dir, exist_ok=True)
-                    skimage.io.imsave(os.path.join(submit_dir, scene_path.split('/')[-1] + '_10.png'), (disp_pr * 256).astype('uint16'))
+                    skimage.io.imsave(os.path.join(submit_dir, scene_name + '_10.png'), (disp_pr * 256).astype('uint16'))
             else:  # output as rgb video visualization
                 disp_pr = disp_pr[0, 0].detach().cpu().numpy()  # 1,h,w
                 disp_pr = pseudoColorMap(disp_pr, vmin=0, vmax=96, kitti_style=True)
                 if frame_ind == 0:
                     video_dir = os.path.join('./kitti_15_seq_out', 'video')
                     os.makedirs(video_dir, exist_ok=True)
-                    video_path = os.path.join(video_dir, scene_path.split('/')[-1] + '.avi')
+                    video_path = os.path.join(video_dir, scene_name + '.avi')
                     video = cv2.VideoWriter(video_path, cv2.VideoWriter_fourcc(*'MJPG'), 2, (disp_pr.shape[1], disp_pr.shape[0]))  # 2fps
                 video.write(disp_pr)
         if not submission:
