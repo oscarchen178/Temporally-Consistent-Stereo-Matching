@@ -298,7 +298,7 @@ def train(args):
             assert args.restore_ckpt.endswith(".pth")
             logging.info("Loading checkpoint...")
             checkpoint = torch.load(args.restore_ckpt)
-            model.load_state_dict(checkpoint, strict=True)
+            model.load_state_dict(checkpoint['model'], strict=True)
             logging.info(f"Done loading checkpoint")
 
     print("Parameter Count: %d" % count_parameters(model))
@@ -331,7 +331,7 @@ def train(args):
         epoch += 1
         if args.ddp:
             train_loader.sampler.set_epoch(epoch)
-        for i_batch, (_, *data_blob) in enumerate(tqdm(train_loader)):
+        for i_batch, (_, *data_blob) in tqdm(enumerate(train_loader)):
             # temporal training
             if args.temporal:
                 # assert args.frame_length > 1
@@ -444,7 +444,7 @@ def train(args):
     print("FINISHED TRAINING")
     # logger.close()
     if local_rank == 0:
-        PATH = 'checkpoints/%s.pth' % args.name
+        PATH = 'checkpoints/new_%s.pth' % args.name
         torch.save({'model': model.module.state_dict()}, PATH)
 
     return PATH
@@ -508,7 +508,7 @@ if __name__ == '__main__':
     wandb.init(
         job_type="train",
         project=args.name,
-        entity="zengjiaxi"
+        entity="oscar17chen-university-of-toronto"
     )
     # add the args to wandb
     wandb.config.update(args)
