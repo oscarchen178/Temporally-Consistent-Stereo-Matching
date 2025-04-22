@@ -174,7 +174,7 @@ def validate_tartanair(args, model, iters=32, mixed_prec=False):
         previous_T = None
         net_list = None
 
-        for (image1, image2, disp_gt, T) in tqdm(zip(image1_list, image2_list, flow_gt_list, pose_list)):
+        for j, (image1, image2, disp_gt, T) in tqdm(enumerate(zip(image1_list, image2_list, flow_gt_list, pose_list))):
             # load
             image1, image2, disp_gt, T = load(args, image1, image2, disp_gt, T)
             padder = InputPadder(image1.shape, divis_by=32)

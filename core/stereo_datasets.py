@@ -158,7 +158,6 @@ class StereoDataset(data.Dataset):
             else:
                 valid_seq = (flow_seq.abs() < 512).float().squeeze(1)
 
-
             return [image1_list[0], image1_list[-1]], left_seq, right_seq, flow_seq, valid_seq, T_seq, K, baseline
 
         else:  # single pair loader: load data by image pair
@@ -719,6 +718,7 @@ def fetch_dataloader(args):
     else:
         raise NotImplementedError(f"Dataset {dataset_name} not implemented")
     train_dataset = new_dataset
+
     if args.ddp:
         train_sampler = torch.utils.data.distributed.DistributedSampler(
             train_dataset,
@@ -728,8 +728,11 @@ def fetch_dataloader(args):
                                        pin_memory=False, num_workers=4, prefetch_factor=4, drop_last=True,
                                        sampler=train_sampler, persistent_workers=True)
     else:
-        train_loader = data.DataLoader(train_dataset, batch_size=args.batch_size,
-                                       pin_memory=False, num_workers=int(os.environ.get('SLURM_CPUS_PER_TASK', 6)) - 2, prefetch_factor=4, drop_last=True,
+        # train_loader = data.DataLoader(train_dataset, batch_size=args.batch_size,
+        #                                pin_memory=False, num_workers=int(os.environ.get('SLURM_CPUS_PER_TASK', 6)) - 2, prefetch_factor=4, drop_last=True,
+        #                                shuffle=False)
+        train_loader = data.DataLoader(train_dataset, batch_size=4,
+                                       pin_memory=False, num_workers=0, prefetch_factor=None, drop_last=True,
                                        shuffle=True)
 
     logging.info('Training with %d image pairs' % len(train_dataset))
